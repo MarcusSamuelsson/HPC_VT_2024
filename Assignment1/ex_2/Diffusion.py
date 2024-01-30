@@ -4,6 +4,7 @@ from functools import wraps
 grid_shape = (640, 640)
 
 
+@profile
 def evolve(grid, dt, D=1.0):
     xmax, ymax = grid_shape
     new_grid = [[0.0] * ymax for x in range(xmax)]
@@ -34,3 +35,6 @@ def run_experiment(num_iterations):
     # Evolve the initial conditions
     for i in range(num_iterations):
         grid = evolve(grid, 0.1)
+
+if __name__ == "__main__":
+    run_experiment(10)
