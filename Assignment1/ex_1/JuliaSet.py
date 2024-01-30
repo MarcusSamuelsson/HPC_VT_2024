@@ -20,10 +20,10 @@ def timefnavg(fn):
             result = fn(*args, **kwargs)
             t2 = time.time()
             
-            all_timers[i] = t2 - t1
+            #all_timers[i] = t2 - t1
             
             #Timer taking in to consideration the time a function call inside the function takes
-            #all_timers[i] = (t2-result)-t1
+            all_timers[i] = (t2-result)-t1
         
         avrage_time = sum(all_timers) / total_itterations
         standard_deviation = 0
@@ -54,8 +54,8 @@ def timefn(fn):
         return result
     return measure_time
 
-#@timefnavg
-#@profile
+@timefnavg
+@profile
 def calc_pure_python(desired_width, max_iterations):
     """Create a list of complex coordinates (zs) and complex parameters (cs),
     build Julia set"""
@@ -97,7 +97,7 @@ def calc_pure_python(desired_width, max_iterations):
     return secs
 
 #@timefnavg
-@profile
+#@profile
 def calculate_z_serial_purepython(maxiter, zs, cs):
     """Calculate output list using Julia update rule"""
     output = [0] * len(zs)
