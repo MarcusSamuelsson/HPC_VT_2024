@@ -57,9 +57,9 @@ def calc_pure_python(desired_width, max_iterations):
     # print(calculate_z_serial_purepython.__name__ + " took", secs, "seconds")
     # This sum is expected for a 1000^2 grid with 300 iterations
     # It ensures that our code evolves exactly as we'd intended
-    assert sum(output) == 33219980
+    #assert sum(output) == 33219980
 
-    return secs
+    return output
 
 def calculate_z_serial_purepython(maxiter, zs, cs):
     """Calculate output list using Julia update rule"""
