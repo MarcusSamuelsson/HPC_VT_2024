@@ -8,6 +8,9 @@ def DGEMM(A, B, C):
             for k in range(n):
                 C[i][j] += A[i][k] * B[k][j]
 
+def DGEMM_NP(A, B, C):
+    C = np.matmul(A, B)
+
 def get_standard_deviation(times, avg):
     return sum([(x - avg) ** 2 for x in times]) / len(times)
 
@@ -27,13 +30,21 @@ def run_time_test(size_var, itter):
         
         for j in range(itter):
             start = timer()
-            DGEMM(A, B, C)
+            #DGEMM(A, B, C)
+            DGEMM_NP(A, B, C)
             times[j] = timer() - start
 
         average[i] = sum(times) / itter
         std_dev[i] = get_standard_deviation(times, average[i])
 
     return average, std_dev
+
+def get_giga_flops_per_second(size_var, avg):
+    giga_flops = [0] * len(size_var)
+    for i in range(len(size_var)):
+        n = size_var[i]
+        giga_flops[i] = (2 * n ** 3) / (avg[i] * 10 ** 9)
+    return giga_flops
 
 def print_for_excel(size_var, avg, std_dev):
     print("Writing to file")
@@ -54,3 +65,9 @@ if __name__ == "__main__":
 
     avg, std_dev = run_time_test(size_var, itter)
     print_for_excel(size_var, avg, std_dev)
+
+    giga_flops = get_giga_flops_per_second(size_var, avg)
+
+    print("Giga flops per second")
+    for i in range(len(size_var)):
+        print(f"n = {size_var[i]}: {giga_flops[i]}")
