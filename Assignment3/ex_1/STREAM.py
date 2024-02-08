@@ -1,41 +1,6 @@
-from timeit import default_timer as timer
 from sys import getsizeof as sizeof
 import array
-
-def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
-    times = [0] * 4
-
-    # Copy
-    start = timer()
-    for i in range(STREAM_ARRAY_SIZE):
-        a[i] = b[i]
-    times[0] = timer() - start
-
-    # Scale
-    start = timer()
-    for i in range(STREAM_ARRAY_SIZE):
-        a[i] = 3.0 * b[i]
-    times[1] = timer() - start
-
-    # Add
-    start = timer()
-    for i in range(STREAM_ARRAY_SIZE):
-        a[i] = b[i] + c[i]
-    times[2] = timer() - start
-    
-    # Triad
-    start = timer()
-    for i in range(STREAM_ARRAY_SIZE):
-        a[i] = b[i] + 3.0 * c[i]
-    times[3] = timer() - start
-
-    # Get memory bandwidth
-    copy = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[0]
-    scale = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[1]
-    add = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[2]
-    triad = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[3]
-
-    return copy, add, scale, triad
+import cythonfn
 
 def print_avg_for_excel(size_var, copy_avg, add_avg, scale_avg, triad_avg, functions):
     titles = ["Copy", "Scale", "Add", "Triad", "Time"]
@@ -90,7 +55,7 @@ def run_test():
                     b = [0] * size
                     c = [0] * size
 
-                copy, add, scale, triad = stream_test(size, STREAM_ARRAY_TYPE, a, b, c)
+                copy, add, scale, triad = cythonfn.stream_test(size, STREAM_ARRAY_TYPE, a, b, c)
                 total_copy[i] = copy
                 total_add[i] = add
                 total_scale[i] = scale
