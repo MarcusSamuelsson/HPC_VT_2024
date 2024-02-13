@@ -1,36 +1,45 @@
-from timeit import default_timer as timer
+import time
+cimport cython
 
-def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def stream_test(int STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
+    cdef double start, sizemem
+    cdef unsigned int i
+    cdef float copy, scale, add, triad
     times = [0] * 4
 
+    # Get size of memory
+    sizemem = 2 * STREAM_ARRAY_SIZE * sizeof(float)
+
     # Copy
-    start = timer()
+    start = time.perf_counter()
     for i in range(STREAM_ARRAY_SIZE):
         a[i] = b[i]
-    times[0] = timer() - start
+    times[0] = time.perf_counter() - start
 
     # Scale
-    start = timer()
+    start = time.perf_counter()
     for i in range(STREAM_ARRAY_SIZE):
         a[i] = 3.0 * b[i]
-    times[1] = timer() - start
+    times[1] = time.perf_counter() - start
 
     # Add
-    start = timer()
+    start = time.perf_counter()
     for i in range(STREAM_ARRAY_SIZE):
         a[i] = b[i] + c[i]
-    times[2] = timer() - start
+    times[2] = time.perf_counter() - start
     
     # Triad
-    start = timer()
+    start = time.perf_counter()
     for i in range(STREAM_ARRAY_SIZE):
         a[i] = b[i] + 3.0 * c[i]
-    times[3] = timer() - start
+    times[3] = time.perf_counter() - start
 
-    # Get memory bandwidth
-    copy = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[0]
-    scale = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[1]
-    add = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[2]
-    triad = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[3]
+    # Get memory bandwidth triad
+    copy = sizemem / times[0]
+    scale = sizemem / times[1]
+    add = sizemem / times[2]
+    triad = sizemem / times[3]
 
     return copy, add, scale, triad

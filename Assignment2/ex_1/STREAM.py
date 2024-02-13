@@ -1,15 +1,20 @@
-from timeit import default_timer as timer
+from time import perf_counter as timer
 from sys import getsizeof as sizeof
 import array
 
 def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
     times = [0] * 4
 
+    sizemem = 2 * STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE)
+    print(f"Size of memory: {sizeof(STREAM_ARRAY_TYPE)}")
+
     # Copy
     start = timer()
     for i in range(STREAM_ARRAY_SIZE):
         a[i] = b[i]
     times[0] = timer() - start
+
+    print(f"time: {times[0]}")
 
     # Scale
     start = timer()
@@ -30,10 +35,10 @@ def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
     times[3] = timer() - start
 
     # Get memory bandwidth
-    copy = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[0]
-    scale = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[1]
-    add = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[2]
-    triad = STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE) / times[3]
+    copy = sizemem/times[0]
+    scale = sizemem/times[1]
+    add = sizemem/times[2]
+    triad = sizemem/times[3]
 
     return copy, add, scale, triad
 
@@ -64,7 +69,6 @@ def print_avg_for_excel(size_var, copy_avg, add_avg, scale_avg, triad_avg, funct
 def run_test():
     itterations = 10
     size_variations = [10, 100, 1000, 10000, 50000, 100000, 500000, 1000000, 10000000]
-    STREAM_ARRAY_TYPE = float
     functions = ["arrays.array", "python.list"]
     final_avg_copy = [0] * len(size_variations)*2
     final_avg_add = [0] * len(size_variations)*2
@@ -85,10 +89,12 @@ def run_test():
                     a = array.array("f", [0] * size)
                     b = array.array("f", [0] * size)
                     c = array.array("f", [0] * size)
+                    STREAM_ARRAY_TYPE = array.array
                 elif fun == "python.list":
                     a = [0] * size
                     b = [0] * size
                     c = [0] * size
+                    STREAM_ARRAY_TYPE = list
 
                 copy, add, scale, triad = stream_test(size, STREAM_ARRAY_TYPE, a, b, c)
                 total_copy[i] = copy
@@ -104,10 +110,10 @@ def run_test():
             avg_add = (sum(total_add)/itterations)/1000000
             avg_triad = (sum(total_triad)/itterations)/1000000
 
-            print(f"Avrage bandwidth copy: {avg_copy} MB/s")
-            print(f"Avrage bandwidth scale: {avg_scale} MB/s")
-            print(f"Avrage bandwidth add: {avg_add} MB/s")
-            print(f"Avrage bandwidth triad: {avg_triad} MB/s")
+            print(f"Avrage bandwidth copy: {avg_copy} MB")
+            print(f"Avrage bandwidth scale: {avg_scale} MB")
+            print(f"Avrage bandwidth add: {avg_add} MB")
+            print(f"Avrage bandwidth triad: {avg_triad} MB")
             print("---------------------------------")
             print("")
 

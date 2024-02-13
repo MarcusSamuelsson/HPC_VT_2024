@@ -28,8 +28,8 @@ def print_avg_for_excel(size_var, copy_avg, add_avg, scale_avg, triad_avg, funct
                     
 def run_test():
     itterations = 10
+    STREAM_ARRAY_TYPE = array.array
     size_variations = [10, 100, 1000, 10000, 50000, 100000, 500000, 1000000, 10000000]
-    STREAM_ARRAY_TYPE = float
     functions = ["arrays.array", "python.list"]
     final_avg_copy = [0] * len(size_variations)*2
     final_avg_add = [0] * len(size_variations)*2
@@ -50,10 +50,12 @@ def run_test():
                     a = array.array("f", [0] * size)
                     b = array.array("f", [0] * size)
                     c = array.array("f", [0] * size)
+                    STREAM_ARRAY_TYPE = 920
                 elif fun == "python.list":
-                    a = [0] * size
-                    b = [0] * size
-                    c = [0] * size
+                    a = array.array("f", [0] * size)
+                    b = array.array("f", [0] * size)
+                    c = array.array("f", [0] * size)
+                    STREAM_ARRAY_TYPE = 920
 
                 copy, add, scale, triad = cythonfn.stream_test(size, STREAM_ARRAY_TYPE, a, b, c)
                 total_copy[i] = copy
