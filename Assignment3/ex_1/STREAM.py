@@ -28,9 +28,8 @@ def print_avg_for_excel(size_var, copy_avg, add_avg, scale_avg, triad_avg, funct
                     
 def run_test():
     itterations = 10
-    STREAM_ARRAY_TYPE = array.array
     size_variations = [10, 100, 1000, 10000, 50000, 100000, 500000, 1000000, 10000000]
-    functions = ["arrays.array", "python.list"]
+    functions = ["python.list"]
     final_avg_copy = [0] * len(size_variations)*2
     final_avg_add = [0] * len(size_variations)*2
     final_avg_scale = [0] * len(size_variations)*2
@@ -47,17 +46,17 @@ def run_test():
 
             for i in range(itterations):
                 if fun == "arrays.array":
-                    a = array.array("f", [0] * size)
-                    b = array.array("f", [0] * size)
-                    c = array.array("f", [0] * size)
-                    STREAM_ARRAY_TYPE = 920
+                    a = array.array("d", [1.0] * size)
+                    b = array.array("d", [2.0] * size)
+                    c = array.array("d", [0.0] * size)
+                    STREAM_ARRAY_TYPE_SIZE = sizeof(array.array("d", [0])) - sizeof(array.array("d", []))
                 elif fun == "python.list":
-                    a = array.array("f", [0] * size)
-                    b = array.array("f", [0] * size)
-                    c = array.array("f", [0] * size)
-                    STREAM_ARRAY_TYPE = 920
+                    a = [1.0] * size
+                    b = [2.0] * size
+                    c = [0.0] * size
+                    STREAM_ARRAY_TYPE_SIZE = sizeof([0]) - sizeof([])
 
-                copy, add, scale, triad = cythonfn.stream_test(size, STREAM_ARRAY_TYPE, a, b, c)
+                copy, add, scale, triad = cythonfn.stream_test(size, STREAM_ARRAY_TYPE_SIZE, a, b, c)
                 total_copy[i] = copy
                 total_add[i] = add
                 total_scale[i] = scale
@@ -71,10 +70,10 @@ def run_test():
             avg_add = (sum(total_add)/itterations)/1000000
             avg_triad = (sum(total_triad)/itterations)/1000000
 
-            print(f"Avrage bandwidth copy: {avg_copy} MB/s")
-            print(f"Avrage bandwidth scale: {avg_scale} MB/s")
-            print(f"Avrage bandwidth add: {avg_add} MB/s")
-            print(f"Avrage bandwidth triad: {avg_triad} MB/s")
+            print(f"Avrage bandwidth copy: {avg_copy} MB")
+            print(f"Avrage bandwidth scale: {avg_scale} MB")
+            print(f"Avrage bandwidth add: {avg_add} MB")
+            print(f"Avrage bandwidth triad: {avg_triad} MB")
             print("---------------------------------")
             print("")
 
@@ -89,4 +88,6 @@ def run_test():
 if __name__ == "__main__":
     run_test()
     print("Done")
+        
+
         

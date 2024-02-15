@@ -3,7 +3,6 @@ from sys import getsizeof as sizeof
 import array
 from objsize import get_deep_size
 
-@profile
 def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE_SIZE, a, b, c):
     times = [0] * 4
 
