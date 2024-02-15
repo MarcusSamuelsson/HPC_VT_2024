@@ -1,20 +1,19 @@
 from time import perf_counter as timer
 from sys import getsizeof as sizeof
 import array
+from objsize import get_deep_size
 
-def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
+@profile
+def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE_SIZE, a, b, c):
     times = [0] * 4
 
-    sizemem = 2 * STREAM_ARRAY_SIZE * sizeof(STREAM_ARRAY_TYPE)
-    print(f"Size of memory: {sizeof(STREAM_ARRAY_TYPE)}")
+    sizemem = STREAM_ARRAY_SIZE * STREAM_ARRAY_TYPE_SIZE
 
     # Copy
     start = timer()
     for i in range(STREAM_ARRAY_SIZE):
         a[i] = b[i]
     times[0] = timer() - start
-
-    print(f"time: {times[0]}")
 
     # Scale
     start = timer()
@@ -35,10 +34,10 @@ def stream_test(STREAM_ARRAY_SIZE, STREAM_ARRAY_TYPE, a, b, c):
     times[3] = timer() - start
 
     # Get memory bandwidth
-    copy = sizemem/times[0]
-    scale = sizemem/times[1]
-    add = sizemem/times[2]
-    triad = sizemem/times[3]
+    copy = (2 * sizemem)/times[0]
+    scale = (2 * sizemem)/times[1]
+    add = (3 * sizemem)/times[2]
+    triad = (3 * sizemem)/times[3]
 
     return copy, add, scale, triad
 
@@ -86,17 +85,17 @@ def run_test():
 
             for i in range(itterations):
                 if fun == "arrays.array":
-                    a = array.array("f", [0] * size)
-                    b = array.array("f", [0] * size)
-                    c = array.array("f", [0] * size)
-                    STREAM_ARRAY_TYPE = array.array
+                    a = array.array("d", [1.0] * size)
+                    b = array.array("d", [2.0] * size)
+                    c = array.array("d", [0.0] * size)
+                    STREAM_ARRAY_TYPE_SIZE = sizeof(array.array("d", [0])) - sizeof(array.array("d", []))
                 elif fun == "python.list":
-                    a = [0] * size
-                    b = [0] * size
-                    c = [0] * size
-                    STREAM_ARRAY_TYPE = list
+                    a = [1.0] * size
+                    b = [2.0] * size
+                    c = [0.0] * size
+                    STREAM_ARRAY_TYPE_SIZE = sizeof([0]) - sizeof([])
 
-                copy, add, scale, triad = stream_test(size, STREAM_ARRAY_TYPE, a, b, c)
+                copy, add, scale, triad = stream_test(size, STREAM_ARRAY_TYPE_SIZE, a, b, c)
                 total_copy[i] = copy
                 total_add[i] = add
                 total_scale[i] = scale
